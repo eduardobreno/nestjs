@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  # nest:
+  #   container_name: nest
+  #   ports:
+  #     - 3000:3000
+  # networks:
+  #   - internal
+
+  shhareit-mongo:
+    image: mongo:latest
+    container_name: mongodb_dev
+    expose: # expose port only internal for docker
+      - 27017
+    # ports: # expose port outside docker
+    #   - 27017:27017
+    # networks:
+    #   - internal
+# # networks:
+# #   internal:
+# #     driver: bridge
