@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+  nest:
+    container_name: nest
+    build:
+      context: .
+      target: production
+    command: yarn start:prod
+    ports:
+      - 3000:3000
+
+  shhareit-mongo:
+    container_name: mongodb_production
+    image: mongo:latest
+    expose: # expose port only internal for docker
+      - 27017
+    volumes:
+      - ./mongodb/production:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: production

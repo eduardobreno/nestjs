@@ -1,19 +1,13 @@
-FROM node:lts-alpine
+FROM node:lts-alpine as builder
 # App directory
 WORKDIR /app
 
-# App dependencies
-COPY package*.json ./
-COPY *.lock ./
-RUN yarn install    
+COPY . .
+RUN yarn install --silent
+RUN yarn build
 
-# Copy app source code
+FROM builder as staging
+COPY .env.staging .env
 
-# Env setup
-# COPY .env.example .env
-
-#Expose port and begin application
-# EXPOSE 3000
-
-# Start the app
-# CMD [ "yarn", "start:dev"]
+FROM builder as production
+COPY .env.production .env
