@@ -11,7 +11,7 @@ services:
   # - /app/node_modules
 
   shhareit-mongo:
-    container_name: mongodb_dev
+    container_name: mongodb-dev
     image: mongo:latest
     expose: # expose port only internal for docker
       - 27017
@@ -23,6 +23,7 @@ services:
       MONGO_INITDB_DATABASE: dev
 
   mongo-express:
+    container_name: mongo-express-dev
     image: mongo-express
     restart: always
     ports:

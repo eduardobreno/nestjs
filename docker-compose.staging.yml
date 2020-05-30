@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   nest:
-    container_name: nest
+    container_name: nest-staging
     build:
       context: .
       target: staging
@@ -11,7 +11,7 @@ services:
       - 3000:3000
 
   shhareit-mongo:
-    container_name: mongodb_staging
+    container_name: mongodb-staging
     image: mongo:latest
     expose: # expose port only internal for docker
       - 27017
@@ -23,6 +23,7 @@ services:
       # MONGO_INITDB_ROOT_PASSWORD: example
 
   mongo-express:
+    container_name: mongo-express-staging
     image: mongo-express
     restart: always
     ports:

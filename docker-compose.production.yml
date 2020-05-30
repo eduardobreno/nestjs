@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   nest:
-    container_name: nest
+    container_name: nest-production
     build:
       context: .
       target: production
@@ -11,7 +11,7 @@ services:
       - 3000:3000
 
   shhareit-mongo:
-    container_name: mongodb_production
+    container_name: mongodb-production
     image: mongo:latest
     expose: # expose port only internal for docker
       - 27017
