@@ -14,14 +14,14 @@ export class UsersController {
   async create(@Body() body: CreateUserPayload): Promise<CreateUserPayload> {
     const result = await this.usersService.create(body as User);
     if (!result) {
-      throw new HttpException('Email already in use', HttpStatus.CONFLICT);
+      throw new HttpException('Email or username already in use', HttpStatus.CONFLICT);
     }
     return result as CreateUserPayload
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() model: UpdateUserPayload): Promise<UpdateUserPayload> {
+  @Put(':userId')
+  async update(@Param('userId') id: string, @Body() model: UpdateUserPayload): Promise<UpdateUserPayload> {
     const result = await this.usersService.findByIdOrEmail(id)
     if (!result) {
       throw new HttpException(undefined, HttpStatus.NOT_FOUND);
@@ -36,8 +36,8 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async findByIdOrEmail(@Param('id') id: string): Promise<CreateUserPayload> {
+  @Get(':userId')
+  async findByIdOrEmail(@Param('userId') id: string): Promise<CreateUserPayload> {
     const result = await this.usersService.findByIdOrEmail(id)
     if (!result) {
       throw new HttpException(undefined, HttpStatus.NOT_FOUND);

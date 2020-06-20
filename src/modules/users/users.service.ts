@@ -9,8 +9,9 @@ export class UsersService {
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
     async create(body: User): Promise<User | boolean> {
-        const exists = await this.findByIdOrEmail(body.email)
-        if (exists) return false
+
+        if (await this.findByUsernameOrEmail(body.email) ||
+            await this.findByUsernameOrEmail(body.username)) return false
         const createdCat = new this.userModel(body);
         return createdCat.save();
     }
@@ -31,6 +32,12 @@ export class UsersService {
         const exists = await this.userModel.findOne({ $or: [{ email: id }, { _id }] }).exec();
         if (exists) return exists
 
+        return false
+    }
+
+    async findByUsernameOrEmail(username: string): Promise<User | boolean> {
+        const exists = await this.userModel.findOne({ $or: [{ email: username }, { username }] }).exec();
+        if (exists) return exists
         return false
     }
 
