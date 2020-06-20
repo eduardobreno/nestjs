@@ -2,26 +2,23 @@
 
 ### Installation
 
-
-`npm install`
+`yarn install`
 
 ### Running
 
-This example requires docker or a local mongodb installation.  If using a local mongodb, see `app.module.ts` for connection options, and make sure there are matching options for the mongodb installation and the source code.
+#### Local
 
-#### Docker
+Database
 
-There is a `docker-compose.yml` file for starting Docker.
+```bash
+docker-compose -f docker-compose.local.yml up
+```
 
-`docker-compose up`
+It will run mongodb, mongo-express, will create a folder `mongodb` with mongodb data files.  
+Access [http://localhost:8081/](http://localhost:8081/) for mongo express
 
-After running the sample, you can stop the Docker container with
+Server
 
-`docker-compose down`
-
-### Run the sample
-
-Then, run Nest as usual:
-
-`npm run start`
-
+```bash
+start:dev:local
+```

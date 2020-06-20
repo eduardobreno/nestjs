@@ -35,7 +35,7 @@ export class UsersService {
     }
 
     async findByUsernameAndPassword(username: string, password: string): Promise<User | boolean> {
-        const exists = await this.userModel.findOne({ username: username, password: password }).exec();
+        const exists = await this.userModel.findOne({ $or: [{ email: username }, { username }], password: password }).exec();
         if (exists) return exists
         return false
     }
