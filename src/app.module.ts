@@ -5,7 +5,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { AppController } from './app.controller';
-import { FilesModule } from './modules/files/files.module';
 
 
 @Module({
@@ -21,7 +20,6 @@ import { FilesModule } from './modules/files/files.module';
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UsersModule,
-    FilesModule,
   ],
 
   controllers: [AppController],

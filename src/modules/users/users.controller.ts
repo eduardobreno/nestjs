@@ -1,14 +1,13 @@
-import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UploadedFile } from '@nestjs/common';
 import { ApiTags, ApiHeader, ApiCreatedResponse } from '@nestjs/swagger';
-import { FilesInterceptor } from '@nestjs/platform-express';
-import * as Multer from 'multer';
 
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
+import { UploadFileConfig, IFile } from 'src/decorators/UploadFile.decorator';
+import { AuthUser, IAuthUser } from 'src/decorators/Auth.decorator';
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { CreateUserPayload } from './payloads/create-user.payload';
 import { UpdateUserPayload } from './payloads/update-user.payload';
-import { AuthUser, IAuthUser } from './user.decorator';
 @ApiHeader({
   name: 'Authorization',
   description: 'Bearer JWT',
@@ -58,9 +57,9 @@ export class UsersController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @UploadFileConfig('file', 'profile')
   @Post('upload/profile/photo')
-  @UseInterceptors(FilesInterceptor('file', 1))
-  async uploadFile(@AuthUser() user: IAuthUser, @UploadedFiles() file: Multer.File[]): Promise<any> {
+  async uploadFile(@AuthUser() user: IAuthUser, @UploadedFile() file: IFile): Promise<any> {
     console.log(user);
     console.log(file);
 
