@@ -9,7 +9,6 @@ export class UsersService {
     constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
     async create(body: User): Promise<User | boolean> {
-
         if (await this.findByUsernameOrEmail(body.email) ||
             await this.findByUsernameOrEmail(body.username)) return false
         const createdCat = new this.userModel(body);

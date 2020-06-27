@@ -1,15 +1,24 @@
 import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus } from '@nestjs/common';
+import { ApiTags, ApiHeader, ApiResponse, ApiCreatedResponse } from '@nestjs/swagger';
 
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { CreateUserPayload } from './payloads/create-user.payload';
 import { UpdateUserPayload } from './payloads/update-user.payload';
-
+@ApiHeader({
+  name: 'Authorization',
+  description: 'Bearer JWT',
+})
+@ApiTags('users')
 @Controller('v1/users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: CreateUserPayload,
+  })
   @Post()
   async create(@Body() body: CreateUserPayload): Promise<CreateUserPayload> {
     const result = await this.usersService.create(body as User);
