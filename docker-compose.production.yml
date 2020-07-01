@@ -7,6 +7,8 @@ services:
       context: .
       target: production
     command: yarn start:prod
+    volumes:
+      - ./media/production:/app/media/production
     ports:
       - 3000:3000
 

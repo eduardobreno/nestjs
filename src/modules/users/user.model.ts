@@ -5,7 +5,7 @@ import { Document } from 'mongoose';
 export class User extends Document {
 
   @Prop({ default: null })
-  readonly photo: string;
+  photo: string;
 
   @Prop({ required: true })
   readonly displayName: string;

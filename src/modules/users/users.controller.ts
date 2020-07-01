@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UploadedFile } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UploadedFile, Req } from '@nestjs/common';
 import { ApiTags, ApiHeader, ApiCreatedResponse } from '@nestjs/swagger';
+import { Request } from 'express';
 
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { UploadFileConfig, IFile } from 'src/decorators/UploadFile.decorator';
@@ -8,6 +9,7 @@ import { UsersService } from './users.service';
 import { User } from './user.model';
 import { CreateUserPayload } from './payloads/create-user.payload';
 import { UpdateUserPayload } from './payloads/update-user.payload';
+import { getHttpUrl } from 'src/helpers/url.helper';
 @ApiHeader({
   name: 'Authorization',
   description: 'Bearer JWT',
@@ -24,20 +26,20 @@ export class UsersController {
   @Post()
   async create(@Body() body: CreateUserPayload): Promise<CreateUserPayload> {
     const result = await this.usersService.create(body as User);
-    if (!result) {
-      throw new HttpException('Email or username already in use', HttpStatus.CONFLICT);
+    if (result) {
+      return result as CreateUserPayload
     }
-    return result as CreateUserPayload
+    throw new HttpException('Email or username already in use', HttpStatus.CONFLICT);
   }
 
   @UseGuards(JwtAuthGuard)
   @Put(':userId')
   async update(@Param('userId') id: string, @Body() model: UpdateUserPayload): Promise<UpdateUserPayload> {
     const result = await this.usersService.findByIdOrEmail(id)
-    if (!result) {
-      throw new HttpException(undefined, HttpStatus.NOT_FOUND);
+    if (result) {
+      return await this.usersService.update(id, model as User);
     }
-    return await this.usersService.update(id, model as User);
+    throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
 
   @UseGuards(JwtAuthGuard)
@@ -50,18 +52,23 @@ export class UsersController {
   @Get(':userId')
   async findByIdOrEmail(@Param('userId') id: string): Promise<CreateUserPayload> {
     const result = await this.usersService.findByIdOrEmail(id)
-    if (!result) {
-      throw new HttpException(undefined, HttpStatus.NOT_FOUND);
+    if (result) {
+      return result as CreateUserPayload
     }
-    return result as CreateUserPayload
+    throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
 
   @UseGuards(JwtAuthGuard)
   @UploadFileConfig('file', 'profile')
   @Post('upload/profile/photo')
-  async uploadFile(@AuthUser() user: IAuthUser, @UploadedFile() file: IFile): Promise<any> {
-    console.log(user);
-    console.log(file);
+  async uploadFile(@AuthUser() user: IAuthUser, @Req() req: Request, @UploadedFile() file: IFile): Promise<any> {
 
+    const result = await this.usersService.updatePhoto(user.userId, file.path)
+
+    if (result) {
+      const json = { ...result, photo: `${getHttpUrl(req)}${result.photo}` }
+      return json as CreateUserPayload
+    }
+    throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
 }
