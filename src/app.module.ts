@@ -2,9 +2,10 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
-import { AppController } from './app.controller';
+import { AuthModule } from 'src/modules/auth/auth.module';
+import { UsersModule } from 'src/modules/users/users.module';
+import { FilesModule } from 'src/modules/files/files.module';
+import { AppController } from 'src/app.controller';
 
 
 @Module({
@@ -20,6 +21,7 @@ import { AppController } from './app.controller';
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     UsersModule,
+    FilesModule,
   ],
 
   controllers: [AppController],
