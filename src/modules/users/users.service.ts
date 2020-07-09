@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import { IFile } from 'src/commons/decorators/UploadFile.decorator';
+import { FilesService } from 'src/modules/files/files.service';
 import { User } from './user.model';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
+    constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly filesServices: FilesService) { }
 
     async create(body: User): Promise<User> {
         if (await this.findByUsernameOrEmail(body.email) ||
@@ -18,11 +20,16 @@ export class UsersService {
         return await this.userModel.findByIdAndUpdate(id, newModel, { new: true });
     }
 
-    async updatePhoto(id: string, photo: string): Promise<User> {
+    async updatePhoto(id: string, file: IFile): Promise<User> {
+        const u = await this.findByIdOrEmail(id)
+        const fileO = { ...file, id: u.photoFileId }
+        const savedFile = await this.filesServices.create(fileO)
+
+
         const user = await this.findByIdOrEmail(id)
         if (user === undefined) return undefined
         const model = user as User
-        model.photo = photo
+        model.photoFileId = savedFile.id
         return await this.userModel.findByIdAndUpdate(id, model, { new: true });
     }
 

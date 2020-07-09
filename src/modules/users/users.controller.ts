@@ -10,7 +10,6 @@ import { User } from './user.model';
 import { CreateUserPayload } from './payloads/create-user.payload';
 import { UpdateUserPayload } from './payloads/update-user.payload';
 import { getHttpUrl } from 'src/commons/helpers/url.helper';
-import { FilesService } from '../files/files.service';
 @ApiHeader({
   name: 'Authorization',
   description: 'Bearer JWT',
@@ -18,7 +17,7 @@ import { FilesService } from '../files/files.service';
 @ApiTags('users')
 @Controller('v1/users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService, private readonly filesServices: FilesService) { }
+  constructor(private readonly usersService: UsersService) { }
 
   @ApiCreatedResponse({
     description: 'The record has been successfully created.',
@@ -64,12 +63,10 @@ export class UsersController {
   @Post('upload/profile/photo')
   async uploadFile(@AuthUser() user: IAuthUser, @Req() req: Request, @UploadedFile() file: IFile): Promise<any> {
 
-    const savedFile = await this.filesServices.create(file)
-
-    const result = await (await this.usersService.updatePhoto(user.userId, `api/v1/files/${savedFile.id}`)).toJSON()
+    const result = await (await this.usersService.updatePhoto(user.userId, file)).toJSON()
 
     if (result) {
-      const json = { ...result, photo: `${getHttpUrl(req)}${result.photo}` }
+      const json = { ...result, photoFileId: `${getHttpUrl(req)}api/v1/files/${result.photoFileId}` }
       return json as CreateUserPayload
     }
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);

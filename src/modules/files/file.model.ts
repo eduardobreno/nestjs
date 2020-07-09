@@ -3,7 +3,6 @@ import { Document } from 'mongoose';
 
 @Schema({ versionKey: false })
 export class File extends Document {
-
   @Prop({ required: true })
   readonly originalname: string;
   @Prop({ required: true })

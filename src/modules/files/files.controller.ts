@@ -1,7 +1,6 @@
 import { Controller, Get, Param, HttpException, HttpStatus, Res } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { createReadStream } from 'fs'
 import { FilesService } from './files.service';
 
 @ApiHeader({
