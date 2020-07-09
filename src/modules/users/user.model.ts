@@ -1,12 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
-import { File } from '../files/file.model';
+import { File, FileSchema } from '../files/file.model';
 
 @Schema({ versionKey: false })
 export class User extends Document {
 
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: File.name, default: null })
-  photoFileId: MongooseSchema.Types.ObjectId;
+  @Prop({ type: FileSchema, ref: File.name, default: null })
+  photo: File;
 
   @Prop({ required: true })
   readonly displayName: string;

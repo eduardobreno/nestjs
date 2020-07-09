@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UploadedFile, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Param, UseGuards, HttpException, HttpStatus, UploadedFile, Req, Res } from '@nestjs/common';
 import { ApiTags, ApiHeader, ApiCreatedResponse } from '@nestjs/swagger';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
@@ -62,12 +62,28 @@ export class UsersController {
   @UploadFileConfig('file', 'profile')
   @Post('upload/profile/photo')
   async uploadFile(@AuthUser() user: IAuthUser, @Req() req: Request, @UploadedFile() file: IFile): Promise<any> {
-
     const result = await (await this.usersService.updatePhoto(user.userId, file)).toJSON()
-
     if (result) {
-      const json = { ...result, photoFileId: `${getHttpUrl(req)}api/v1/files/${result.photoFileId}` }
+      const json = { ...result, photo: `${getHttpUrl(req)}api/v1/users/profile/photo/${user.userId}` }
       return json as CreateUserPayload
+    }
+    throw new HttpException(undefined, HttpStatus.NOT_FOUND);
+  }
+
+  @Get('profile/photo/:userId')
+  async findPhotoByUser(@Param('userId') id: string, @Res() response: Response): Promise<any> {
+    const result = await (await this.usersService.findByIdOrEmail(id)).photo
+    if (result) {
+      const options = {
+        root: result.destination,
+        headers: {
+          'Content-Type': result.mimetype,
+          'Content-Length': result.size,
+          'Content-Disposition': `inline;filename="${result.filename}"`
+        }
+      };
+      return response.sendFile(result.filename, options)
+
     }
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }

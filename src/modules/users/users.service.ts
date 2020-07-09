@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { FilesService } from 'src/modules/files/files.service';
 import { User } from './user.model';
+import { removeFile } from 'src/commons/helpers/file.helpers';
 
 @Injectable()
 export class UsersService {
@@ -21,15 +22,11 @@ export class UsersService {
     }
 
     async updatePhoto(id: string, file: IFile): Promise<User> {
-        const u = await this.findByIdOrEmail(id)
-        const fileO = { ...file, id: u.photoFileId }
-        const savedFile = await this.filesServices.create(fileO)
-
-
         const user = await this.findByIdOrEmail(id)
         if (user === undefined) return undefined
         const model = user as User
-        model.photoFileId = savedFile.id
+        await removeFile(`${model?.photo?.destination}/${model?.photo?.filename}`)
+        model.photo = file
         return await this.userModel.findByIdAndUpdate(id, model, { new: true });
     }
 

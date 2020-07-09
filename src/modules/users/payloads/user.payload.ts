@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Schema } from 'mongoose';
+import { File } from 'src/modules/files/file.model';
 
 export class UserPayload {
     @ApiProperty()
     readonly id?: string;
 
     @ApiProperty()
-    readonly photoFileId: Schema.Types.ObjectId;
+    readonly photo: File
 
     @ApiProperty({ required: true })
     readonly displayName: string;

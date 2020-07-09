@@ -1,12 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsOptional } from 'class-validator';
-import { Schema } from 'mongoose';
+import { File } from 'src/modules/files/file.model';
 
 
 export class UpdateUserPayload {
     @ApiProperty()
     @IsOptional()
-    readonly photoFileId: Schema.Types.ObjectId;
+    readonly photo: File
 
     @ApiProperty({ required: true })
     @IsNotEmpty()
