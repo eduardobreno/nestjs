@@ -3,13 +3,13 @@ import { ApiTags, ApiHeader, ApiCreatedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
-import { UploadFileConfig, IFile } from 'src/decorators/UploadFile.decorator';
-import { AuthUser, IAuthUser } from 'src/decorators/Auth.decorator';
+import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
+import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { CreateUserPayload } from './payloads/create-user.payload';
 import { UpdateUserPayload } from './payloads/update-user.payload';
-import { getHttpUrl } from 'src/helpers/url.helper';
+import { getHttpUrl } from 'src/commons/helpers/url.helper';
 import { FilesService } from '../files/files.service';
 @ApiHeader({
   name: 'Authorization',
