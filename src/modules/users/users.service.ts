@@ -5,6 +5,7 @@ import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { FilesService } from 'src/modules/files/files.service';
 import { User } from './user.model';
 import { removeFile } from 'src/commons/helpers/file.helpers';
+import { getHttpUrl } from 'src/commons/helpers/url.helper';
 
 @Injectable()
 export class UsersService {
@@ -55,4 +56,5 @@ export class UsersService {
         if (user) return user
         return undefined
     }
+
 }

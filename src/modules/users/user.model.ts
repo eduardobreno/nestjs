@@ -6,7 +6,7 @@ import { File, FileSchema } from '../files/file.model';
 export class User extends Document {
 
   @Prop({ type: FileSchema, ref: File.name, default: null })
-  photo: File;
+  photo: File & string;
 
   @Prop({ required: true })
   readonly displayName: string;
