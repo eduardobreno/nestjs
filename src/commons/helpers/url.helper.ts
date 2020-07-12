@@ -6,6 +6,7 @@ export function getHttpUrl(req: Request): string {
 }
 
 export function transformJsonField(json: JSON, field: string, value: string): unknown {
-
-    return { ...json, [field]: value }
+    if (json[field])
+        return { ...json, [field]: value }
+    return json
 }

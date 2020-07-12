@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IFile } from 'src/commons/decorators/UploadFile.decorator';
-import { FilesService } from 'src/modules/files/files.service';
-import { User } from './user.model';
 import { removeFile } from 'src/commons/helpers/file.helpers';
-import { getHttpUrl } from 'src/commons/helpers/url.helper';
+import { FilesService } from 'src/modules/files/files.service';
+import { hashPassword, compareHashPassword } from 'src/commons/helpers/password.helpers';
+import { User } from './user.model';
 
 @Injectable()
 export class UsersService {
@@ -14,11 +14,19 @@ export class UsersService {
     async create(body: User): Promise<User> {
         if (await this.findByUsernameOrEmail(body.email) ||
             await this.findByUsernameOrEmail(body.username)) return undefined
-        return new this.userModel(body).save();
+
+        return new this.userModel({ ...body, password: await hashPassword(body.password) }).save();
+    }
+
+    async findByUsernameAndPassword(username: string, password: string): Promise<User> {
+        const user = await this.userModel.findOne({ $or: [{ email: username }, { username }] }).exec();
+        if (user && await compareHashPassword(password, user.password)) return user
+        return undefined
     }
 
     async update(id: string, model: User): Promise<User> {
-        const { email, ...newModel } = model
+        const newModel = model.toJSON()
+        delete newModel.email
         return await this.userModel.findByIdAndUpdate(id, newModel, { new: true });
     }
 
@@ -45,14 +53,17 @@ export class UsersService {
         return undefined
     }
 
-    async findByUsernameOrEmail(username: string): Promise<User> {
+    private async findByUsernameOrEmail(username: string): Promise<User> {
         const user = await this.userModel.findOne({ $or: [{ email: username }, { username }] }).exec();
         if (user) return user
         return undefined
     }
 
-    async findByUsernameAndPassword(username: string, password: string): Promise<User> {
-        const user = await this.userModel.findOne({ $or: [{ email: username }, { username }], password: password }).exec();
+    async findByUsernameOrDisplayName(name: string): Promise<User[]> {
+        const user = await this.userModel
+            .find({ $or: [{ username: new RegExp(`^${name}`, 'i') }, { displayName: new RegExp(`^${name}`, 'i') }] })
+            .select("-email")
+            .exec();
         if (user) return user
         return undefined
     }
