@@ -3,13 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { removeFile } from 'src/commons/helpers/file.helpers';
-import { FilesService } from 'src/modules/files/files.service';
 import { hashPassword, compareHashPassword } from 'src/commons/helpers/password.helpers';
+import { FriendsService } from 'src/modules/friends/friends.service';
+import { Friend } from 'src/modules/friends/friend.model';
 import { User } from './user.model';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly filesServices: FilesService) { }
+    constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly friendsService: FriendsService) { }
 
     async create(body: User): Promise<User> {
         if (await this.findByUsernameOrEmail(body.email) ||
@@ -25,7 +26,7 @@ export class UsersService {
     }
 
     async update(id: string, model: User): Promise<User> {
-        const newModel = model.toJSON()
+        const newModel = { ...model }
         delete newModel.email
         return await this.userModel.findByIdAndUpdate(id, newModel, { new: true });
     }
@@ -67,5 +68,17 @@ export class UsersService {
         if (user) return user
         return undefined
     }
+
+    async requestFriend(userId: string, username: string): Promise<Friend> {
+        const user = await this.findByIdOrEmail(userId)
+        const friend = await this.findByUsernameOrEmail(username)
+        // if (user.id === friend.id) return undefined
+        if (user && friend) {
+            const requested = await this.friendsService.saveRequest(user._id, friend._id)
+            if (requested) return requested
+        }
+        return undefined
+    }
+
 
 }

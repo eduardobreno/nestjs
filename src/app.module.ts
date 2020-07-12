@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from 'src/modules/auth/auth.module';
 import { UsersModule } from 'src/modules/users/users.module';
 import { FilesModule } from 'src/modules/files/files.module';
+import { FriendsModule } from 'src/modules/friends/friends.module';
 import { AppController } from 'src/app.controller';
 
 
@@ -22,6 +23,7 @@ import { AppController } from 'src/app.controller';
     AuthModule,
     UsersModule,
     FilesModule,
+    FriendsModule,
   ],
 
   controllers: [AppController],

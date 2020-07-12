@@ -5,7 +5,7 @@ import { File, FileSchema } from '../files/file.model';
 @Schema({ versionKey: false })
 export class User extends Document {
 
-  @Prop({ type: FileSchema, ref: File.name, default: null })
+  @Prop({ type: FileSchema, ref: File.name })
   photo: File & string;
 
   @Prop({ required: true })
