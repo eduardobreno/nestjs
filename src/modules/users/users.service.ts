@@ -4,13 +4,11 @@ import { Model, Types } from 'mongoose';
 import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { removeFile } from 'src/commons/helpers/file.helpers';
 import { hashPassword, compareHashPassword } from 'src/commons/helpers/password.helpers';
-import { FriendsService } from 'src/modules/friends/friends.service';
-import { Friend } from 'src/modules/friends/friend.model';
 import { User } from './user.model';
 
 @Injectable()
 export class UsersService {
-    constructor(@InjectModel(User.name) private readonly userModel: Model<User>, private readonly friendsService: FriendsService) { }
+    constructor(@InjectModel(User.name) private readonly userModel: Model<User>) { }
 
     async create(body: User): Promise<User> {
         if (await this.findByUsernameOrEmail(body.email) ||
@@ -59,6 +57,11 @@ export class UsersService {
         if (user) return user
         return undefined
     }
+    async findByUsername(username: string): Promise<User> {
+        const user = await this.userModel.findOne({ username }).exec();
+        if (user) return user
+        return undefined
+    }
 
     async findByUsernameOrDisplayName(name: string): Promise<User[]> {
         const user = await this.userModel
@@ -68,17 +71,5 @@ export class UsersService {
         if (user) return user
         return undefined
     }
-
-    async requestFriend(userId: string, username: string): Promise<Friend> {
-        const user = await this.findByIdOrEmail(userId)
-        const friend = await this.findByUsernameOrEmail(username)
-        // if (user.id === friend.id) return undefined
-        if (user && friend) {
-            const requested = await this.friendsService.saveRequest(user._id, friend._id)
-            if (requested) return requested
-        }
-        return undefined
-    }
-
 
 }

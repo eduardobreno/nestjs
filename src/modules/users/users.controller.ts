@@ -6,7 +6,6 @@ import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { getHttpUrl, transformJsonField } from 'src/commons/helpers/url.helper';
 import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
-import { Friend } from 'src/modules/friends/friend.model';
 import { UsersService } from './users.service';
 import { User } from './user.model';
 import { UpdateUserDto } from './payloads/update-user.dto';
@@ -65,14 +64,6 @@ export class UsersController {
         return transformJsonField(user.toJSON(), 'photo', `${getHttpUrl(req)}api/v1/users/profile/photo/${user.id}`) as User
       })
     }
-    throw new HttpException(undefined, HttpStatus.NOT_FOUND);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Get('request/:username')
-  async requestFriend(@Param('username') username: string, @AuthUser() user: IAuthUser,): Promise<Friend> {
-    const result = await this.usersService.requestFriend(user.userId, username)
-    if (result) return result
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
 

@@ -1,13 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { User } from 'src/modules/users/user.model';
-
-export enum FriendshipStatus {
-  PENDING,
-  ACCEPTED,
-  REFUSED,
-  BLOCKED
-}
+import { FriendshipStatus } from 'src/commons/constants';
 
 @Schema({ versionKey: false })
 export class Friend extends Document {

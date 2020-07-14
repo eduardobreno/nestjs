@@ -3,3 +3,10 @@ export const jwtConstants = {
 };
 
 export const saltPasword = 10
+
+export enum FriendshipStatus {
+    PENDING = 'PENDING',
+    ACCEPTED = 'ACCEPTED',
+    REFUSED = 'REFUSED',
+    BLOCKED = 'BLOCKED'
+}
