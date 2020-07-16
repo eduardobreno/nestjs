@@ -22,3 +22,6 @@ npm-debug.log
 /dist
 /mongodb*
 /media/
+
+*.env*
+!.env.example
