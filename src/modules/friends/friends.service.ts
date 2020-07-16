@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Friend } from './friend.model';
 import { FriendshipStatus } from 'src/commons/constants';
 import { UsersService } from '../users/users.service';
+import { ListFriendsDto } from './payloads/list-friends.dto';
 
 @Injectable()
 export class FriendsService {
@@ -26,6 +27,21 @@ export class FriendsService {
             ]
         }).exec();
         return result
+    }
+
+    async findAll(userId: Types.ObjectId): Promise<ListFriendsDto[]> {
+        const result = await this.model.find({ userId, status: FriendshipStatus.ACCEPTED })
+            .populate("friendId", "-email")
+            .select(["friendId", "createdAt"])
+            .exec();
+        return result.map(item => {
+            let lf = new ListFriendsDto()
+            const j = item.toObject()
+            lf = j.friendId
+            lf.createdAt = j.createdAt
+            console.log("lf", lf)
+            return lf
+        })
     }
 
     async findPendingRequest(userId: Types.ObjectId): Promise<Friend[]> {

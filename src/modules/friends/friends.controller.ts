@@ -17,6 +17,14 @@ export class FriendsController {
     constructor(private readonly friendsService: FriendsService) { }
 
     @UseGuards(JwtAuthGuard)
+    @Get()
+    async findAll(@AuthUser() user: IAuthUser): Promise<any> {
+        const result = await this.friendsService.findAll(Types.ObjectId(user.userId))
+        if (result) return result
+        throw new HttpException(undefined, HttpStatus.NOT_FOUND);
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get('request/:username')
     async requestFriend(@Param('username') username: string, @AuthUser() user: IAuthUser): Promise<Friend> {
         const result = await this.friendsService.requestFriend(user.userId, username)
