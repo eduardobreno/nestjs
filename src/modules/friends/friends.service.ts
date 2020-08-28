@@ -5,6 +5,7 @@ import { Friend } from './friend.model';
 import { FriendshipStatus } from 'src/commons/constants';
 import { UsersService } from '../users/users.service';
 import { ListFriendsDto } from './payloads/list-friends.dto';
+import { User } from '../users/user.model';
 
 @Injectable()
 export class FriendsService {
@@ -30,16 +31,28 @@ export class FriendsService {
     }
 
     async findAll(userId: Types.ObjectId): Promise<ListFriendsDto[]> {
-        const result = await this.model.find({ userId, status: FriendshipStatus.ACCEPTED })
-            .populate("friendId", "-email")
-            .select(["friendId", "createdAt"])
+        const populateQuery = [
+            { path: 'userId', select: '-email' },
+            { path: 'friendId', select: '-email' }
+        ];
+
+        const result = await this.model.find({
+            $or: [
+                { userId },
+                { friendId: userId }
+            ],
+            status: FriendshipStatus.ACCEPTED
+        })
+            .populate(populateQuery)
+            .select(["userId", "friendId", "createdAt"])
             .exec();
-        return result.map(item => {
+
+        return result.map((item: Friend) => {
             let lf = new ListFriendsDto()
             const j = item.toObject()
-            lf = j.friendId
+            lf = userId.equals(j.userId.id) ? j.friendId : j.userId
             lf.createdAt = j.createdAt
-            console.log("lf", lf)
+
             return lf
         })
     }
