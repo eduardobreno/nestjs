@@ -20,5 +20,5 @@ Access [http://localhost:8081/](http://localhost:8081/) for mongo express
 Server
 
 ```bash
-start:dev:local
+yarn start:dev:local
 ```
