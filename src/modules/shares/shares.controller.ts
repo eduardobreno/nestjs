@@ -1,7 +1,7 @@
 import { Controller, Get, Param, HttpException, HttpStatus, Res, UseGuards, Post, UploadedFile } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
-import { FilesService } from './files.service';
+import { SharesService } from './shares.service';
 import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -10,14 +10,14 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
     name: 'Authorization',
     description: 'Bearer JWT',
 })
-@ApiTags('files')
-@Controller('v1/files')
-export class FilesController {
-    constructor(private readonly filesServices: FilesService) { }
+@ApiTags('share')
+@Controller('v1')
+export class SharesController {
+    constructor(private readonly sharesService: SharesService) { }
 
-    @Get(':fileId')
+    @Get('shared/:fileId')
     async findById(@Param('fileId') id: string, @Res() response: Response): Promise<any> {
-        const result = await this.filesServices.findById(id)
+        const result = await this.sharesService.findById(id)
         if (result) {
             const options = {
                 root: result.destination,
@@ -37,10 +37,10 @@ export class FilesController {
 
     @UseGuards(JwtAuthGuard)
     @UploadFileConfig('file', 'share')
-    @Post('to/:username')
+    @Post('share/to/:username')
     async sendFile(@AuthUser() user: IAuthUser, @Param("username") username: string, @UploadedFile() file: IFile): Promise<any> {
 
-        const result = this.filesServices.sendFile(user.userId, username, file)
+        const result = this.sharesService.sendFile(user.userId, username, file)
 
         if (result) return result
         throw new HttpException(undefined, HttpStatus.NOT_FOUND);

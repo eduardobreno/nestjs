@@ -1,24 +1,28 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { File, FileSchema } from 'src/modules/files/file.model';
 
 @Schema({ versionKey: false })
-export class File extends Document {
+export class Share extends Document {
+
+  @Prop({ type: FileSchema, ref: File.name })
+  photo: File & string;
+
   @Prop({ required: true })
-  readonly originalname: string;
+  readonly displayName: string;
+
   @Prop({ required: true })
-  readonly mimetype: string;
+  readonly username: string;
+
   @Prop({ required: true })
-  readonly destination: string;
+  readonly email: string;
+
   @Prop({ required: true })
-  readonly filename: string;
-  @Prop({ required: true })
-  readonly path: string;
-  @Prop({ required: true })
-  readonly size: string;
+  readonly password: string;
 }
 
 
-export const FileSchema = SchemaFactory.createForClass(File)
+export const ShareSchema = SchemaFactory.createForClass(Share)
   .set("toObject", {
     virtuals: true,
     transform: (doc, ret) => {
