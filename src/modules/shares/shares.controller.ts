@@ -15,7 +15,28 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class SharesController {
     constructor(private readonly sharesService: SharesService) { }
 
-    @Get('shared/:fileId')
+    @UseGuards(JwtAuthGuard)
+    @Get('shared-with-me')
+    async findAll(@Param('fileId') id: string, @Res() response: Response): Promise<any> {
+        const result = await this.sharesService.findById(id)
+        if (result) {
+            const options = {
+                root: result.destination,
+                headers: {
+                    'Content-Type': result.mimetype,
+                    'Content-Length': result.size,
+                    'Content-Disposition': `inline;filename="${result.filename}"`
+                }
+            };
+            console.log("result", result)
+            return response.sendFile(result.filename, options)
+
+        }
+        throw new HttpException(undefined, HttpStatus.NOT_FOUND);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('get-shared/')
     async findById(@Param('fileId') id: string, @Res() response: Response): Promise<any> {
         const result = await this.sharesService.findById(id)
         if (result) {
