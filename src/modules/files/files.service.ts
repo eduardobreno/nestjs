@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { unlinkSync } from 'fs';
+import { UsersService } from 'src/modules/users/users.service';
 import { File } from './file.model';
+import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 
 
 @Injectable()
 export class FilesService {
-    constructor(@InjectModel(File.name) private readonly model: Model<File>) { }
+    constructor(@InjectModel(File.name) private readonly model: Model<File>, private readonly usersService: UsersService) { }
 
     async create(file: File): Promise<File> {
         const exists = await this.findById(file.id)
@@ -30,6 +32,21 @@ export class FilesService {
         if (user) return user
 
         return undefined
+    }
+
+    async sendFile(from: string, to: string, file: IFile): Promise<any> {
+
+        const user = await this.usersService.findByIdOrEmail(from)
+        if (user === undefined) return undefined
+        const friend = await this.usersService.findByUsername(to)
+        if (friend === undefined) return undefined
+
+        console.log("User", user)
+        console.log("Friend", friend)
+        console.log("file", file)
+
+        return true
+
     }
 
 }

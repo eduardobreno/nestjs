@@ -1,10 +1,10 @@
 import { Controller, Get, Param, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { FriendsService } from './friends.service';
 import { Types } from 'mongoose';
 import { JwtAuthGuard } from 'src/modules/auth/jwt-auth.guard';
 import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
 import { FriendshipStatus } from 'src/commons/constants';
+import { FriendsService } from './friends.service';
 import { Friend } from './friend.model';
 
 @ApiHeader({

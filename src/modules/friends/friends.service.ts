@@ -6,6 +6,7 @@ import { FriendshipStatus } from 'src/commons/constants';
 import { UsersService } from '../users/users.service';
 import { ListFriendsDto } from './payloads/list-friends.dto';
 import { User } from '../users/user.model';
+import { IFile } from 'src/commons/decorators/UploadFile.decorator';
 
 @Injectable()
 export class FriendsService {
