@@ -3,12 +3,17 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UsersService } from 'src/modules/users/users.service';
 import { IFile } from 'src/commons/decorators/UploadFile.decorator';
+import { removeFile } from 'src/commons/helpers/file.helpers';
 import { Share } from './share.model';
+import { FriendsService } from '../friends/friends.service';
+
 
 
 @Injectable()
 export class SharesService {
-    constructor(@InjectModel(Share.name) private readonly model: Model<Share>, private readonly usersService: UsersService) { }
+    constructor(@InjectModel(Share.name) private readonly model: Model<Share>,
+        private readonly usersService: UsersService,
+        private readonly friendsService: FriendsService) { }
 
 
     async findById(id: string): Promise<IFile> {
@@ -21,18 +26,21 @@ export class SharesService {
         return undefined
     }
 
-    async sendFile(from: string, to: string, file: IFile): Promise<any> {
+    async sendFile(from: Types.ObjectId, username: string, file: IFile): Promise<any> {
 
-        const user = await this.usersService.findByIdOrEmail(from)
-        if (user === undefined) return undefined
-        const friend = await this.usersService.findByUsername(to)
-        if (friend === undefined) return undefined
+        const user = await this.usersService.findByIdOrEmail(from.toHexString())
+        const friend = await this.usersService.findByUsername(username)
+        const hasAccepted = await this.friendsService.hasAccepted(user._id, friend._id)
 
-        console.log("User", user)
-        console.log("Friend", friend)
-        console.log("file", file)
+        if (user === undefined || friend === undefined || !hasAccepted) {
+            await removeFile(`${file.destination}/${file.filename}`)
+            return undefined
+        }
 
-        return true
+        const model: Share = (await new this.model({ from: user._id, to: friend._id, file }).save()).toObject();
+        delete model.file
+        return model
+
 
     }
 

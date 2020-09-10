@@ -1,6 +1,7 @@
 import { Controller, Get, Param, HttpException, HttpStatus, Res, UseGuards, Post, UploadedFile } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
+import { Types } from 'mongoose';
 import { SharesService } from './shares.service';
 import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
@@ -60,8 +61,7 @@ export class SharesController {
     @UploadFileConfig('file', 'share')
     @Post('share-to/:username')
     async sendFile(@AuthUser() user: IAuthUser, @Param("username") username: string, @UploadedFile() file: IFile): Promise<any> {
-
-        const result = this.sharesService.sendFile(user.userId, username, file)
+        const result = await this.sharesService.sendFile(Types.ObjectId(user.userId), username, file)
 
         if (result) return result
         throw new HttpException(undefined, HttpStatus.NOT_FOUND);
