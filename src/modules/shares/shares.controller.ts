@@ -58,7 +58,7 @@ export class SharesController {
 
     @UseGuards(JwtAuthGuard)
     @UploadFileConfig('file', 'share')
-    @Post('share/to/:username')
+    @Post('share-to/:username')
     async sendFile(@AuthUser() user: IAuthUser, @Param("username") username: string, @UploadedFile() file: IFile): Promise<any> {
 
         const result = this.sharesService.sendFile(user.userId, username, file)

@@ -19,6 +19,9 @@ export class User extends Document {
 
   @Prop({ required: true })
   readonly password: string;
+
+  @Prop({ default: Date.now })
+  readonly createdAt: Date
 }
 
 

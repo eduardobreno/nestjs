@@ -11,6 +11,7 @@ import { User } from './user.model';
 import { UpdateUserDto } from './payloads/update-user.dto';
 import { CreateUserDto } from './payloads/create-user.dto';
 
+const PROFILE_PHOTO_URL = 'api/v1/users/profile-photo/'
 @ApiTags('users')
 @Controller('v1/users')
 export class UsersController {
@@ -22,7 +23,7 @@ export class UsersController {
     const result = await this.usersService.findAll();
 
     return result.map(user => {
-      return transformJsonField(user.toJSON(), 'photo', `${getHttpUrl(req)}api/v1/users/profile/photo/${user.id}`) as User
+      return transformJsonField(user.toJSON(), 'photo', `${getHttpUrl(req)}${PROFILE_PHOTO_URL}${user.id}`) as User
     })
   }
 
@@ -31,12 +32,12 @@ export class UsersController {
   async findByIdOrEmail(@Param('userId') id: string, @Req() req: Request): Promise<User> {
     const result = await this.usersService.findByIdOrEmail(id)
     if (result) {
-      return transformJsonField(result.toJSON(), 'photo', `${getHttpUrl(req)}api/v1/users/profile/photo/${result.id}`) as User
+      return transformJsonField(result.toJSON(), 'photo', `${getHttpUrl(req)}${PROFILE_PHOTO_URL}${result.id}`) as User
     }
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
 
-  @Get('profile/photo/:userId')
+  @Get('profile-photo/:userId')
   async findPhotoByUser(@Param('userId') id: string, @Res() response: Response): Promise<any> {
     const result = (await this.usersService.findByIdOrEmail(id)).photo
     if (result && existsSync(`${result.destination}/${result.filename}`)) {
@@ -61,7 +62,7 @@ export class UsersController {
     const result = await this.usersService.findByUsernameOrDisplayName(name)
     if (result) {
       return result.map(user => {
-        return transformJsonField(user.toJSON(), 'photo', `${getHttpUrl(req)}api/v1/users/profile/photo/${user.id}`) as User
+        return transformJsonField(user.toJSON(), 'photo', `${getHttpUrl(req)}${PROFILE_PHOTO_URL}${user.id}`) as User
       })
     }
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);
@@ -77,11 +78,11 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @UploadFileConfig('file', 'profile')
-  @Post('upload/profile/photo')
+  @Post('upload/profile-photo')
   async uploadFile(@AuthUser() user: IAuthUser, @Req() req: Request, @UploadedFile() file: IFile): Promise<User> {
     const result = await this.usersService.updatePhoto(user.userId, file)
     if (result) {
-      return transformJsonField(result.toJSON(), 'photo', `${getHttpUrl(req)}api/v1/users/profile/photo/${result.id}`) as User
+      return transformJsonField(result.toJSON(), 'photo', `${getHttpUrl(req)}${PROFILE_PHOTO_URL}${result.id}`) as User
     }
     throw new HttpException(undefined, HttpStatus.NOT_FOUND);
   }
