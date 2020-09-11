@@ -35,11 +35,10 @@ export class SharesService {
     }
 
     async findById(id: string): Promise<IFile> {
-        let _id = Types.ObjectId.createFromTime(0)
-        if (Types.ObjectId.isValid(id)) _id = Types.ObjectId(id)
+        if (!Types.ObjectId.isValid(id)) return undefined
 
-        const user = await this.model.findById(_id).exec();
-        if (user) return user
+        const file = await this.model.findById(Types.ObjectId(id)).exec();
+        if (file) return file
 
         return undefined
     }
