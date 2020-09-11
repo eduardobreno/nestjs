@@ -1,11 +1,15 @@
-import { Controller, Get, Param, HttpException, HttpStatus, Res, UseGuards, Post, UploadedFile } from '@nestjs/common';
+import { Controller, Get, Param, HttpException, HttpStatus, Res, UseGuards, Post, UploadedFile, Req } from '@nestjs/common';
 import { ApiHeader, ApiTags } from '@nestjs/swagger';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import { SharesService } from './shares.service';
 import { UploadFileConfig, IFile } from 'src/commons/decorators/UploadFile.decorator';
 import { AuthUser, IAuthUser } from 'src/commons/decorators/Auth.decorator';
+import { getHttpUrl } from 'src/commons/helpers/url.helper';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { BaseShareDto } from './payloads/base-share.dto';
+
+const DOWNLOAD_FILE_URL = 'api/v1/shared/'
 
 @ApiHeader({
     name: 'Authorization',
@@ -18,41 +22,37 @@ export class SharesController {
 
     @UseGuards(JwtAuthGuard)
     @Get('shared-with-me')
-    async findAll(@Param('fileId') id: string, @Res() response: Response): Promise<any> {
-        const result = await this.sharesService.findById(id)
+    async findAll(@AuthUser() user: IAuthUser, @Req() req: Request): Promise<BaseShareDto[]> {
+        const result = await this.sharesService.findSharedToUserId(user.userId)
         if (result) {
-            const options = {
-                root: result.destination,
-                headers: {
-                    'Content-Type': result.mimetype,
-                    'Content-Length': result.size,
-                    'Content-Disposition': `inline;filename="${result.filename}"`
-                }
-            };
-            console.log("result", result)
-            return response.sendFile(result.filename, options)
+            return result.map(shared => {
+                const f = new BaseShareDto()
+                f.id = shared.id
+                f.mimeType = shared.file.mimetype
+                f.size = shared.file.size
+                f.url = `${getHttpUrl(req)}${DOWNLOAD_FILE_URL}${shared.id}`
+                f.createdAt = shared.createdAt
+                return f
+            })
 
         }
         throw new HttpException(undefined, HttpStatus.NOT_FOUND);
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('get-shared/')
-    async findById(@Param('fileId') id: string, @Res() response: Response): Promise<any> {
-        const result = await this.sharesService.findById(id)
+    @Get('shared')
+    async findById(@AuthUser() user: IAuthUser): Promise<any> {
+        const result = await this.sharesService.findSharedToUserId(user.userId)
         if (result) {
-            const options = {
-                root: result.destination,
-                headers: {
-                    'Content-Type': result.mimetype,
-                    'Content-Length': result.size,
-                    'Content-Disposition': `inline;filename="${result.filename}"`
-                }
-            };
-            console.log("result", result)
-            return response.sendFile(result.filename, options)
+            return result.map(shared => {
+                const f = new BaseShareDto()
+                f.id = shared.id
+                f.createdAt = shared.createdAt
+                return f
+            })
 
         }
+
         throw new HttpException(undefined, HttpStatus.NOT_FOUND);
     }
 

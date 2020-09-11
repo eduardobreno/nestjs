@@ -16,6 +16,24 @@ export class SharesService {
         private readonly friendsService: FriendsService) { }
 
 
+    async findSharedToUserId(id: string): Promise<IFile> {
+        if (!Types.ObjectId.isValid(id)) return undefined
+
+        const shared = await this.model.find({ to: Types.ObjectId(id) }).exec();
+        if (shared) return shared
+
+        return undefined
+    }
+
+    async findSharedFromUserId(id: string): Promise<IFile> {
+        if (!Types.ObjectId.isValid(id)) return undefined
+
+        const shared = await this.model.find({ from: Types.ObjectId(id) }).exec();
+        if (shared) return shared
+
+        return undefined
+    }
+
     async findById(id: string): Promise<IFile> {
         let _id = Types.ObjectId.createFromTime(0)
         if (Types.ObjectId.isValid(id)) _id = Types.ObjectId(id)
