@@ -9,11 +9,9 @@ export class UpdateUserDto extends BaseUserDto {
     @IsOptional()
     displayName: string;
 
-    @ApiProperty({ required: false })
-    @IsNotEmpty()
-    @IsOptional()
-    username: string;
-
     @IsOptional()
     email: string;
+
+    @IsOptional()
+    username: string;
 }

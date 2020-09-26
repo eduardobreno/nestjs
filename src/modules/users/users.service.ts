@@ -26,6 +26,9 @@ export class UsersService {
     async update(id: string, model: User): Promise<User> {
         const newModel = { ...model }
         delete newModel.email
+        delete newModel.username
+        delete newModel.id
+
         return await this.userModel.findByIdAndUpdate(id, newModel, { new: true });
     }
 
